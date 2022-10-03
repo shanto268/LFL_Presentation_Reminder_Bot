@@ -1,10 +1,31 @@
 from dotenv import load_dotenv
 from Emailer import *
 import os, json
+import datetime
 
 def extract_email_info(gs_info):
     last_entry = gs_info[-1]
     return last_entry
+
+def next_weekday(d, weekday):
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: # Target day already happened this week
+        days_ahead += 7
+    return d + datetime.timedelta(days_ahead)
+
+
+
+def get_earliest_presentation(gs_info):
+    d = datetime.datetime.today()
+    next_monday = next_weekday(d, 0)
+    diffs = []
+
+    for i,info in enumerate(gs_info[1:]):
+        dt_obj = datetime.datetime.strptime(info[-1], '%m/%d/%Y') 
+        diff = dt_obj - next_monday
+        diffs.append((i,diff))
+
+
 
 
 def craft_email(subject, content, email_list, text_list=[]):

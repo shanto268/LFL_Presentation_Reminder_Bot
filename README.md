@@ -1,5 +1,15 @@
 # LFL Presentation Reminder File
 
+## To Do:
+
+- Implement the following scheduler:
+    - [ ]  Read DB
+    - [ ]  FIFO structure for all FALSE entries
+    - [ ]  Pop to get info
+    - [ ]  Send email
+    - [ ]  Overwrite the FALSE to TRUE on remote DB
+
+
 ## Installation:
 
 - Clone the repo
