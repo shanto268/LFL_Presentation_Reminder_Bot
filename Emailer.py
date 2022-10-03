@@ -13,12 +13,12 @@ import datetime as time
 import io
 import os
 import json
-from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.application import MIMEApplication
+from dotenv import load_dotenv
 
 #Email vairables
 load_dotenv(".env")

@@ -13,12 +13,14 @@ __email__ = "shanto@usc.edu"
 import datetime
 from HelperFunctions import *
 from ReadSheets import ReadSheets
+from dotenv import load_dotenv
+
 
 if __name__ == "__main__":
     # weekday choice (day in advance)
 
-    sheets_id_template = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
-    sheets_id = '16cAejW6rClrfbVHeaQsxdckEWzdMC9qBLJt_Dal5Dfs'
+    load_dotenv(".env")
+    sheets_id = os.environ.get("SHEETS_ID")
     range_query = 'A:D'
     scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
 
@@ -27,7 +29,7 @@ if __name__ == "__main__":
 
     subject = "Presentation Reminder ({})".format(p_date)
     email_list = [email]
-    content = f"Hi {name},\n\nThis is a reminder that you have a presentation talk - \"{p_title}\" - on {p_date}\n\nLooking Forward to it 🤩,\nLFL Bot."
+    content = f"Hi {name},\n\nThis is a reminder that you have a presentation talk - \"{p_title}\" - on {p_date}.\n\nLooking Forward to it 🤩,\nLFL Bot."
 
     craft_email(subject, content, email_list)
 
