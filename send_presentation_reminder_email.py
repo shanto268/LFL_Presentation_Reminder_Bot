@@ -16,22 +16,34 @@ from dotenv import load_dotenv
 
 
 if __name__ == "__main__":
-    # weekday choice (day in advance)
 
     load_dotenv(".env")
     sheets_id = os.environ.get("SHEETS_ID")
     range_query = 'A:D'
     scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
+    day_notice=3
 
-    gs_info = ReadSheets(sheets_id,range_query,scopes).get_values()
-    name, email, p_title, p_date = extract_email_info(gs_info)
-    # print(gs_info)
-    get_earliest_presentation(gs_info)
+    try:
+        gs_info = ReadSheets(sheets_id,range_query,scopes).get_values()
+        # print(gs_info)
+        df = create_df(gs_info)
+        df = create_priority_column(df,day_notice)
+        name, email, p_title, p_date, days_left = extract_email_info(df)
 
-    subject = "Presentation Reminder ({})".format(p_date)
-    email_list = [email]
-    content = f"Hi {name},\n\nThis is a reminder that you have a presentation talk - \"{p_title}\" - on {p_date}.\n\nLooking Forward to it 🤩,\nLFL Bot."
+        p_date =  datetime.datetime.strftime(p_date, '%m/%d/%Y')
 
-    # craft_email(subject, content, email_list)
+        subject = "Presentation Reminder ({})".format(p_date)
+        email_list = [email]
+        content = f"Hi {name},\n\nThis is a reminder that you have a presentation talk - \"{p_title}\" - on {p_date}.\n\nLooking Forward to it 🤩,\nLFL Bot."
+
+        craft_email(subject, content, email_list)
+
+    except Exception as e:
+        subject = "No One Signed Up for Presentation"
+        email_list = [f"{__email__}"]
+        content = f"Hi {__author__},\n\nThis is the exact Exception Message from the LFL bot.\n\n`{e}`"
+        craft_email(subject, content, email_list)
+
+
 
 

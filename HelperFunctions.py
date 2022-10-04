@@ -2,9 +2,32 @@ from dotenv import load_dotenv
 from Emailer import *
 import os, json
 import datetime
+import pandas as pd
 
-def extract_email_info(gs_info):
-    last_entry = gs_info[-1]
+def create_df(gs_info):
+    df = pd.DataFrame(gs_info, columns=gs_info[0])
+    df.drop(index=df.index[0], 
+            axis=0, 
+            inplace=True)
+    return df
+
+
+def create_priority_column(df, day_notice=3):
+    d = datetime.datetime.today()
+    next_monday = next_weekday(d, 0)
+    df['Presentation Date (MM/DD/YYY)'] = pd.to_datetime(df['Presentation Date (MM/DD/YYY)'])
+    df["daysLeft"] = (df["Presentation Date (MM/DD/YYY)"] - pd.Timestamp.now().normalize()).dt.days
+
+    df = df[df["daysLeft"]>0]
+    df = df[df["daysLeft"]<=day_notice]
+
+    # print(df)
+    return df
+
+
+def extract_email_info(df):
+    last_entry = df.values.tolist()[0]
+    # print(last_entry)
     return last_entry
 
 def next_weekday(d, weekday):
@@ -21,11 +44,9 @@ def get_earliest_presentation(gs_info):
     diffs = []
 
     for i,info in enumerate(gs_info[1:]):
-        dt_obj = datetime.datetime.strptime(info[-1], '%m/%d/%Y') 
+        dt_obj = datetime.datetime.strptime(info[-1], '%m/%d/%Y')
         diff = dt_obj - next_monday
         diffs.append((i,diff))
-
-
 
 
 def craft_email(subject, content, email_list, text_list=[]):
