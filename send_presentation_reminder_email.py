@@ -13,6 +13,7 @@ __email__ = "shanto@usc.edu"
 from HelperFunctions import *
 from ReadSheets import ReadSheets
 from dotenv import load_dotenv
+import platform
 
 
 if __name__ == "__main__":
@@ -46,8 +47,14 @@ if __name__ == "__main__":
             email_list = [f"{__email__}"]
             content = f"Hi {__author__},\n\nLettng you know the token issue was encountered. Working on the resolution now.\n\n`{e}`"
             craft_email(subject, content, email_list)
-            os.system("rm token.json")
-            os.system("python send_presentation_reminder_email.py")
+            print(platform.system())
+            if platform.system() == "Windows":
+                os.system("rd /s /q token.json")
+                windows_python = r"D:\Users\lfl\Anaconda3\envs\opx-env\python.exe"
+                os.system("{} send_presentation_reminder_email.py".format(windows_python))
+            else:
+                os.system("rm token.json")
+                os.system("python send_presentation_reminder_email.py")
         else:
             subject = "No One Signed Up for Presentation"
             email_list = [f"{__email__}"]
