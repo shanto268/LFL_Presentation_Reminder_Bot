@@ -39,7 +39,9 @@ if __name__ == "__main__":
         craft_email(subject, content, email_list)
 
     except Exception as e:
-        if e == "\'invalid_grant: Token has been expired or revoked.\', {\'error\': \'invalid_grant\', \'error_description\': \'Token has been expired or revoked.\'":
+        token_error_message = "Token has been expired or revoked"
+        if token_error_message in str(e):
+            print("token error detected")
             subject = "Token Issue"
             email_list = [f"{__email__}"]
             content = f"Hi {__author__},\n\nLettng you know the token issue was encountered. Working on the resolution now.\n\n`{e}`"
