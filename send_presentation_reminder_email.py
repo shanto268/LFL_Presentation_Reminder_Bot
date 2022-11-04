@@ -14,6 +14,7 @@ from HelperFunctions import *
 from ReadSheets import ReadSheets
 from dotenv import load_dotenv
 import platform
+import os
 
 
 if __name__ == "__main__":
@@ -42,14 +43,16 @@ if __name__ == "__main__":
     except Exception as e:
         token_error_message = "Token has been expired or revoked"
         if token_error_message in str(e):
-            print("token error detected")
             subject = "Token Issue"
             email_list = [f"{__email__}"]
             content = f"Hi {__author__},\n\nLettng you know the token issue was encountered. Working on the resolution now.\n\n`{e}`"
             craft_email(subject, content, email_list)
-            print(platform.system())
             if platform.system() == "Windows":
-                os.system("rd /s /q token.json")
+                cwd = os.getcwd()
+                try:
+                    os.remove(r"{}\token.json".format(cwd))
+                except:
+                    pass
                 windows_python = r"D:\Users\lfl\Anaconda3\envs\opx-env\python.exe"
                 os.system("{} send_presentation_reminder_email.py".format(windows_python))
             else:
