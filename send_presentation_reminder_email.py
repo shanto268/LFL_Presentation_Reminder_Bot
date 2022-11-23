@@ -27,9 +27,9 @@ if __name__ == "__main__":
 
     try:
         gs_info = ReadSheets(sheets_id,range_query,scopes).get_values()
-        # print(gs_info)
         df = create_df(gs_info)
         df = create_priority_column(df,day_notice)
+        print(df)
         name, email, p_title, p_date, days_left = extract_email_info(df)
 
         p_date =  datetime.datetime.strftime(p_date, '%m/%d/%Y')
