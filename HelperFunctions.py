@@ -24,6 +24,28 @@ def create_priority_column(df, day_notice=3):
     # print(df)
     return df
 
+"""
+START
+"""
+
+def find_first_monday(year, month, day):
+    d = datetime.date(year, int(month), 7)
+    offset = -d.weekday() #weekday = 0 means monday
+    return d + datetime.timedelta(offset)
+
+def LabCitizenDay():
+    today = datetime.date.today()
+    # get next monday date
+    next_monday = today + datetime.timedelta(days=1)
+    # all first monday's for the present year
+    all_first_mondays = [find_first_monday(today.year, i, today.day) for i in range(1,13,1)]
+    if next_monday in all_first_mondays:
+        return True
+    else:
+        return False
+"""
+END
+"""
 
 def extract_email_info(df):
     last_entry = df.values.tolist()[0]

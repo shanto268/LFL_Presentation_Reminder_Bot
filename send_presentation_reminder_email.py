@@ -1,69 +1,34 @@
 # -*- coding: utf-8 -*-
-"""
-====================================================================
-Program : Google_Sheets_Bot/send_presentation_reminder_email.py
-====================================================================
-Summary:
-"""
 __author__ =  "Sadman Ahmed Shanto"
-__date__ = "10/02/2022"
+__date__ = "07/18/2022"
 __email__ = "shanto@usc.edu"
 
-
+import datetime
 from HelperFunctions import *
-from ReadSheets import ReadSheets
-from dotenv import load_dotenv
-import platform
-import os
-
 
 if __name__ == "__main__":
+    # weekday choice (day in advance)
+    p_date = str(datetime.date.today() + datetime.timedelta(days=7))
 
-    load_dotenv(".env")
-    sheets_id = os.environ.get("SHEETS_ID")
-    range_query = 'A:D'
-    scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
-    day_notice=3
+    # liquid nitrogen appt time
+    p_time = "2:30 PM"
 
-    try:
-        gs_info = ReadSheets(sheets_id,range_query,scopes).get_values()
-        df = create_df(gs_info)
-        df = create_priority_column(df,day_notice)
-        print(df)
-        name, email, p_title, p_date, days_left = extract_email_info(df)
+    # content of email
+    """
+    Logic:
+    """
+    if not LabCitizenDay():
+        # read emission file to see whose turn this week (i.e. at execution)
+        recipient_name, recipient_email = extract_lab_maintainer()
 
-        p_date =  datetime.datetime.strftime(p_date, '%m/%d/%Y')
+        # create email for lab maintainer
+        content = f"Hi {recipient_name},\n\nThis is a reminder that you are scheduled for a presentation talk on {p_date} at {p_time}.\n\nLooking Forward to it 🤩,\nLFL Bot."
+        subjectLine = "LFL Lab Presentation Reminder ({})".format(p_date)
 
-        subject = "Presentation Reminder ({})".format(p_date)
-        email_list = [email]
-        content = f"Hi {name},\n\nThis is a reminder that you have a presentation talk - \"{p_title}\" - on {p_date}.\n\nLooking Forward to it 🤩,\nLFL Bot."
+        # send email to lab maintainer
+        craft_email(subjectLine, content, recipient_email)
 
-        craft_email(subject, content, email_list)
-
-    except Exception as e:
-        token_error_message = "Token has been expired or revoked"
-        if token_error_message in str(e):
-            subject = "Token Issue"
-            email_list = [f"{__email__}"]
-            content = f"Hi {__author__},\n\nLettng you know the token issue was encountered. Working on the resolution now.\n\n`{e}`"
-            craft_email(subject, content, email_list)
-            if platform.system() == "Windows":
-                cwd = os.getcwd()
-                try:
-                    os.remove(r"{}\token.json".format(cwd))
-                except:
-                    pass
-                windows_python = r"D:\Users\lfl\Anaconda3\envs\opx-env\python.exe"
-                os.system("{} send_presentation_reminder_email.py".format(windows_python))
-            else:
-                os.system("rm token.json")
-                os.system("python send_presentation_reminder_email.py")
-        else:
-            subject = "No One Signed Up for Presentation"
-            email_list = [f"{__email__}"]
-            content = f"Hi {__author__},\n\nThis is the exact Exception Message from the LFL bot.\n\n`{e}`"
-            craft_email(subject, content, email_list)
-
-
-
-
+        # update the record
+        update_record()
+    else:
+        pass
