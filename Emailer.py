@@ -13,12 +13,12 @@ import datetime as time
 import io
 import os
 import json
+from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.application import MIMEApplication
-from dotenv import load_dotenv
 
 #Email vairables
 load_dotenv(".env")
@@ -30,16 +30,18 @@ GMAIL_PASSWORD =  os.environ.get("PASSWD")
 
 
 class Emailer:
-    def __init__(self, email_list, text_list, subjectLine, emailContent):
+    def __init__(self, email_list, textList, subjectLine, emailContent):
         self.email_list = email_list
-        self.text_list = text_list
+        self.textList = textList
         self.subjectLine = subjectLine
         self.emailContent = emailContent
         self.path2pdf = ""
 
-    def send_email(self, destination):
+    def send_email(self):
+        destination = self.email_list
         subject = self.subjectLine
         message = self.emailContent
+
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
         server.login(GMAIL_USERNAME, GMAIL_PASSWORD)
@@ -51,6 +53,7 @@ class Emailer:
         msg['To'] = destination
         # Insert the text to the msg going by e-mail
         msg.attach(MIMEText(message, "plain"))
+        # Attach the pdf to the msg going by e-mail
         # send msg
         server.send_message(msg)
         server.close()
@@ -102,4 +105,4 @@ class Emailer:
         emails = self.email_list
         for email in emails:
             print("Emailing {}".format(email))
-            self.send_email(email)
+            self.send_email()

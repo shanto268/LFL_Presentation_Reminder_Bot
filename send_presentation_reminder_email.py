@@ -26,7 +26,7 @@ if __name__ == "__main__":
         subjectLine = "LFL Lab Presentation Reminder ({})".format(p_date)
 
         # send email to lab maintainer
-        craft_email(subjectLine, content, recipient_email)
+        send_email(recipient_email, subjectLine, content)
 
         # update the record
         update_record()
