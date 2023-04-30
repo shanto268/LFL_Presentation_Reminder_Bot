@@ -11,7 +11,7 @@ if __name__ == "__main__":
     p_date = str(datetime.date.today() + datetime.timedelta(days=7))
 
     # liquid nitrogen appt time
-    p_time = "2:30 PM"
+    p_time = "10:00 AM"
 
     # content of email
     """
