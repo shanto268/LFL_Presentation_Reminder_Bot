@@ -106,3 +106,29 @@ class Emailer:
         for email in emails:
             print("Emailing {}".format(email))
             self.send_email()
+
+    def send_email_json(self, path_to_json):
+            with open(path_to_json, "r") as f:
+                data = json.load(f)
+            for key in data:
+                name = data[key]["name"]
+                email = data[key]["email"]
+                message = self.emailContent.replace("<name>", name)
+                self.send_email_to_single_person(email, message)
+
+    def send_email_to_single_person(self, destination, message):
+        subject = self.subjectLine
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(GMAIL_USERNAME, GMAIL_PASSWORD)
+        # Craft message (obj)
+        msg = MIMEMultipart()
+
+        msg['Subject'] = subject
+        msg['From'] = GMAIL_USERNAME
+        msg['To'] = destination
+        # Insert the text to the msg going by e-mail
+        msg.attach(MIMEText(message, "plain"))
+        # send msg
+        server.send_message(msg)
+        server.close()
