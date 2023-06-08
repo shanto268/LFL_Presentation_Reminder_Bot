@@ -11,7 +11,7 @@ if __name__ == "__main__":
     p_date = str(datetime.date.today() + datetime.timedelta(days=7))
 
     # liquid nitrogen appt time
-    p_time = "10:00 AM"
+    p_time = "10:00"
 
     # content of email
     """
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         subjectLine = "LFL Lab Presentation Reminder ({})".format(p_date)
 
         # send email to lab maintainer
-        send_email(recipient_email, subjectLine, content)
+        send_email_with_calendar_invite(recipient_email, subjectLine, content, p_date, p_time)
 
         # update the record
         update_record()

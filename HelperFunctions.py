@@ -3,6 +3,36 @@ from Emailer import *
 import os, json
 import datetime
 import pandas as pd
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+from ics import Calendar, Event
+from dateutil import tz
+
+def send_email_with_calendar_invite(recipient_email, subjectLine, content, p_date, p_time):
+    # Create a calendar event
+    event = Event()
+
+    # Get the local timezone
+    local_tz = tz.gettz('America/Los_Angeles')  # Replace with your actual timezone
+
+    # Set the event begin time with the timezone
+    event.begin = '{}T{}:00'.format(p_date, p_time)
+    event.begin = event.begin.replace(tzinfo=local_tz)
+
+    # Set event name
+    event.name = subjectLine.replace("Reminder ","")
+
+    # Add the event to a calendar
+    calendar = Calendar(events=[event])
+
+    # Convert the event to an ics string
+    ics_string = str(calendar)
+
+    # send email to lab maintainer with the calendar invite attached
+    send_email_invite(recipient_email, subjectLine, content, ics_string)
+
 
 def create_df(gs_info):
     df = pd.DataFrame(gs_info, columns=gs_info[0])
@@ -138,6 +168,41 @@ def send_email(email,subjectLine, emailContent):
     sms_list = ['']
     sender = Emailer(email, sms_list, subjectLine, emailContent)
     sender.send_email()
+
+def send_email_invite(to, subject, body, ics_string):
+    load_dotenv(".env")
+    EMAIL_ID = str(os.environ.get("EMAIL_ID"))
+    SMTP_SERVER = os.environ.get("SMTP_SERVER")
+    SMTP_PORT = 587
+    GMAIL_PASSWORD =  os.environ.get("PASSWD")
+
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_ID
+    msg['To'] = to
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    # Attach the ics file
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(ics_string)
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="invite.ics"')
+    msg.attach(part)
+
+    # Connect to the mail server
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.starttls()
+
+    # Login to the email account
+    server.login(EMAIL_ID, GMAIL_PASSWORD)
+
+    # Send the email
+    text = msg.as_string()
+    server.sendmail(EMAIL_ID, to, text)
+
+    # Disconnect from the mail server
+    server.quit()
 
 def update_record(f=".env"):
     # Read in the file
