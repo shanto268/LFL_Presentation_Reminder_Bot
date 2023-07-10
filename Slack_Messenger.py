@@ -9,7 +9,7 @@ Connects to Slack API and send messages
 __author__ = ["Clark Miyamoto", "Sadman Ahmed Shanto"]
 
 
-import slack
+from slack import WebClient
 import os
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
 class Slack_er():
 
     def __init__(self):
-        self.client = slack.WebClient(SLACK_TOKEN)
+        self.client = WebClient(SLACK_TOKEN)
 
     def send_message(self, channel, text):
         '''
