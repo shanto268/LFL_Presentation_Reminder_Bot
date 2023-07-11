@@ -19,6 +19,56 @@ import os
 import pickle
 
 
+def create_event_with_dates(summary, location, description, start_time, end_time):
+    # Define the scopes for the Google Calendar API
+    SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+    creds = None
+
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first time.
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0, access_type='offline')
+
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    # Build the service
+    service = build('calendar', 'v3', credentials=creds)
+
+    # Define the event
+    event = {
+        'summary': summary,
+        'location': location,
+        'description': description,
+        'start': {
+            'dateTime': start_time,
+            'timeZone': 'America/Los_Angeles',
+        },
+        'end': {
+            'dateTime': end_time,
+            'timeZone': 'America/Los_Angeles',
+        },
+        'visibility': 'public',  # Make the event public
+    }
+
+    # Call the Calendar API to create the event
+    event = service.events().insert(calendarId='primary', body=event).execute()
+
+    # Return the link to the event
+    return event['htmlLink']
+
+
 def create_event(summary, location, description, start_time, end_time):
     # Define the scopes for the Google Calendar API
     SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -227,7 +277,10 @@ def extract_lab_maintainer():
 def get_user_info(user_id):
     f = open("lab_members.json")
     data = json.load(f)
-    user_name, user_email = data[user_id]["name"], data[user_id]["email"]
+    try:
+        user_name, user_email = data[user_id]["name"], data[user_id]["email"]
+    except:
+        user_name, user_email = data[user_id]["names"], data[user_id]["emails"]
     return user_name, user_email
 
 def get_last_user_id():

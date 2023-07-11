@@ -37,23 +37,44 @@ if __name__ == "__main__":
         start_time_str = start_time.isoformat()
         end_time_str = end_time.isoformat()
 
-        # event link for calendar
-        event_link = create_event(subjectLine, p_place, f'Presenter: {recipient_name}', start_time_str, end_time_str)
-        slack_content = f"Hi all,\n\nThis is a reminder that {recipient_name} is going to be giving a presentation talk on {p_date} at {p_time} AM."
+        if isinstance(recipient_name,str):
 
-        # content
-        slack_content = f"{slack_content}\n\nAdd to your Google Calendar 🗓️: {event_link}{signature}"
-        email_content = f"Hi {recipient_name},\n\nThis is a reminder that you are scheduled for a presentation talk on {p_date} at {p_time} AM.{signature}"
+            # event link for calendar
+            event_link = create_event(subjectLine, p_place, f'Presenter: {recipient_name}', start_time_str, end_time_str)
+            slack_content = f"Hi all,\n\nThis is a reminder that {recipient_name} is going to be giving a presentation talk on {p_date} at {p_time} AM."
 
-        # send message to slack
-        send_slack_message(slack_content,slack_channel="general")
+            # content
+            slack_content = f"{slack_content}\n\nAdd to your Google Calendar 🗓️: {event_link}{signature}"
+            email_content = f"Hi {recipient_name},\n\nThis is a reminder that you are scheduled for a presentation talk on {p_date} at {p_time} AM.{signature}"
 
-        # send email to lab maintainer
-        send_email_with_calendar_invite(recipient_email, subjectLine, email_content, p_date, p_time)
+            # send message to slack
+            send_slack_message(slack_content,slack_channel="general")
 
+            # send email to lab maintainer
+            send_email_with_calendar_invite(recipient_email, subjectLine, email_content, p_date, p_time)
+
+        elif isinstance(recipient_name,list):
+
+            # convert list to string
+            recipient_names = ", ".join(recipient_name)
+
+            # event link for calendar
+            event_link = create_event(subjectLine, p_place, f'Presenters: {recipient_names}', start_time_str, end_time_str)
+            slack_content = f"Hi all,\n\nThis is a reminder that {recipient_names} are going to be giving a presentation talk on {p_date} at {p_time} AM."
+
+            # send message to slack
+            slack_content = f"{slack_content}\n\nAdd to your Google Calendar 🗓️: {event_link}{signature}"
+            send_slack_message(slack_content,slack_channel="test-gpt")
+
+            # send email to lab maintainer
+            for r_name, r_email in zip(recipient_name,recipient_email):
+                email_content = f"Hi {r_name},\n\nThis is a reminder that you are scheduled for a presentation talk on {p_date} at {p_time} AM.{signature}"
+                send_email_with_calendar_invite(r_email, subjectLine, email_content, p_date, p_time)
         # update the record
         update_record()
+
     else:
+
         emailContent = f"Hi <name>,\n\nThis is a reminder that next week ({p_date} at {p_time}) we will be participating in Lab Citizen\Clean-Up Day.\n\nThanks for taking care of our beautiful LFLab 🥰,\nLFL Bot"
         sender = Emailer(email_list=[""], textList=[], subjectLine=f"Lab Citizen Day ({p_date})", emailContent=emailContent)
         sender.send_email_json("lab_members.json")
