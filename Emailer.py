@@ -108,14 +108,17 @@ class Emailer:
             self.send_email()
 
     def send_email_json(self, path_to_json):
-            with open(path_to_json, "r") as f:
-                data = json.load(f)
-            for key in data:
-                name = data[key]["name"]
-                email = data[key]["email"]
-                message = self.emailContent.replace("<name>", name)
-                self.send_email_to_single_person(email, message)
-
+            try:
+                with open(path_to_json, "r") as f:
+                    data = json.load(f)
+                for key in data:
+                    name = data[key]["name"]
+                    email = data[key]["email"]
+                    message = self.emailContent.replace("<name>", name)
+                    self.send_email_to_single_person(email, message)
+            except:
+                pass
+            
     def send_email_to_single_person(self, destination, message):
         subject = self.subjectLine
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)

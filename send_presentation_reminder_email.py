@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
             # send message to slack
             slack_content = f"{slack_content}\n\nAdd to your Google Calendar 🗓️: {event_link}{signature}"
-            send_slack_message(slack_content,slack_channel="test-gpt")
+            send_slack_message(slack_content,slack_channel="general")
 
             # send email to lab maintainer
             for r_name, r_email in zip(recipient_name,recipient_email):
