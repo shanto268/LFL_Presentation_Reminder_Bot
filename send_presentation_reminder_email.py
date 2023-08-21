@@ -8,10 +8,10 @@ from datetime import datetime, timedelta
 
 if __name__ == "__main__":
     # weekday choice (day in advance)
-    p_date = str((datetime.today() + timedelta(days=7)).date())
+    p_date = str((datetime.today() + timedelta(days=9)).date())
 
     # meeting time
-    p_time = "10:30"
+    p_time = "14:00"
 
     # meeting place
     p_place = "SSC 319"
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
             # event link for calendar
             event_link = create_event(subjectLine, p_place, f'Presenter: {recipient_name}', start_time_str, end_time_str)
-            slack_content = f"Hi all,\n\nThis is a reminder that {recipient_name} is going to be giving a presentation talk on {p_date} at {p_time} AM."
+            slack_content = f"Hi all,\n\nThis is a reminder that {recipient_name} is going to be giving a presentation talk on {p_date} at {p_time} PM."
 
             # content
             slack_content = f"{slack_content}\n\nAdd to your Google Calendar 🗓️: {event_link}{signature}"
